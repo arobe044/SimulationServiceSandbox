@@ -1,0 +1,31 @@
+{  
+    "RabbitMQConfig": 
+    {
+        "HostName": "localhost",
+        "Port": "5672",
+        "Username": "guest",
+        "Password": "guest",
+        "RequestExchangeName":"sim_service_requests_demo_exchange",
+        "ResponseExchangeName":"sim_service_responses_demo_exchange",
+        "TaskExchangeName":"sim_service_tasks_demo_exchange"
+    },
+    "WorkerConfig": 
+    {
+        "WorkerA":
+        {
+            "InstanceNum": 2,
+            "RequestQueueName": "sim_service_requests_demo_queue",
+            "RequestRoutingKey": "demo_request_key",
+            "ResponseQueueName": "sim_service_responses_demo_queue",
+            "ResponseRoutingKey": "demo_response_key"
+        },
+        "WorkerB":
+        {
+            "InstanceNum": 0,
+            "RequestQueueName": "sim_service_requests_demo_queue",
+            "RequestRoutingKey": "demo_request_key",
+            "ResponseQueueName": "sim_service_responses_demo_queue",
+            "ResponseRoutingKey": "demo_response_key"
+        }
+    }
+}
