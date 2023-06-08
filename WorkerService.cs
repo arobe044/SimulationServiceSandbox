@@ -32,7 +32,7 @@ public class WorkerService : BackgroundService
                     var worker = await _workerFactory.CreateWorkerAsync(workerType.Key);
                     workers.Add(worker);
                     _logger.LogInformation($"Starting worker '{workerType.Key}' number {i+1}.");
-                    await worker.DoWorkAsync(stoppingToken, i+1);
+                    await worker.StartAsync(stoppingToken, i+1);
                 }
             }
             _logger.LogInformation("All workers have stopped.");

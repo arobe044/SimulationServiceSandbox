@@ -25,7 +25,7 @@ public class WorkerB : IWorker
         _logger = logger;
     }
 
-    public async Task DoWorkAsync(CancellationToken stoppingToken, int instance)
+    public async Task StartAsync(CancellationToken stoppingToken, int instance)
     {
         await Task.Run(async () =>
         {

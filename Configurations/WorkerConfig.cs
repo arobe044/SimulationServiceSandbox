@@ -22,4 +22,8 @@ namespace Sandbox.Configurations;
         ///RESPONSE QUEUE
         public string ResponseQueueName { get; set; } = "";
         public string ResponseRoutingKey { get; set; } = "";
+
+        //TASK QUEUE
+        public string TaskQueueName { get; set; } = "";
+        public string TaskRoutingKey { get; set; } = "";
     }

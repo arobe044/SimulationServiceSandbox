@@ -11,13 +11,25 @@
     },
     "WorkerConfig": 
     {
-        "WorkerA":
+        "LocusEmulator":
         {
-            "InstanceNum": 2,
+            "InstanceNum": 1,
             "RequestQueueName": "sim_service_requests_demo_queue",
             "RequestRoutingKey": "demo_request_key",
             "ResponseQueueName": "sim_service_responses_demo_queue",
-            "ResponseRoutingKey": "demo_response_key"
+            "ResponseRoutingKey": "demo_response_key",
+            "TaskQueueName": "sim_service_tasks_demo_queue",
+            "TaskRoutingKey": "demo_task_key"
+        },
+        "WorkerA":
+        {
+            "InstanceNum": 0,
+            "RequestQueueName": "sim_service_requests_demo_queue",
+            "RequestRoutingKey": "demo_request_key",
+            "ResponseQueueName": "sim_service_responses_demo_queue",
+            "ResponseRoutingKey": "demo_response_key",
+            "TaskQueueName": "sim_service_tasks_demo_queue",
+            "TaskRoutingKey": "demo_task_key"
         },
         "WorkerB":
         {
@@ -25,7 +37,9 @@
             "RequestQueueName": "sim_service_requests_demo_queue",
             "RequestRoutingKey": "demo_request_key",
             "ResponseQueueName": "sim_service_responses_demo_queue",
-            "ResponseRoutingKey": "demo_response_key"
+            "ResponseRoutingKey": "demo_response_key",                
+            "TaskQueueName": "sim_service_tasks_demo_queue",
+            "TaskRoutingKey": "demo_task_key"
         }
     }
 }

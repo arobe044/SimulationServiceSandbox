@@ -5,6 +5,8 @@ using Sandbox;
 using Sandbox.Configurations;
 using Sandbox.Factories;
 using Newtonsoft.Json;
+using Sandbox.Orchestrators;
+using Sandbox.Controllers;
 
 class Program
 {
@@ -19,8 +21,11 @@ class Program
         {
             services.AddSingleton(rabbitMQConfig);
             services.AddSingleton(workerConfigList);
+            services.AddSingleton<IRabbitMQConsumer, RabbitMQConsumer>();
+            services.AddSingleton<IRabbitMQProducer, RabbitMQProducer>();
             services.AddSingleton<IWorkerFactory, WorkerFactory>();
             services.AddHostedService<WorkerService>();
+            services.AddHostedService<WorkOrchestrator>();
         });
 
         var host = builder.Build();
@@ -29,33 +34,3 @@ class Program
         host.WaitForShutdown();
     }
 }
-
-//class Program
-//{
-    //static void Main(string[] args)
-    //{
-        // var configuration = new ConfigurationBuilder()
-        //     .AddJsonFile("appsettings.json")
-        //     .Build();
-        // var workerConfig = configuration.GetSection("WorkerConfig").Get<WorkerConfig>();
-        // var cancellationTokenSource = new CancellationTokenSource();
-        
-        // // Create the worker factory
-        // var workerFactory = new WorkerFactory();
-        
-        // // Start the workers
-        // foreach (var workerType in workerConfig.WorkerTypes)
-        // {
-        //     for (int i = 0; i < workerType.Instances; i++)
-        //     {
-        //         var worker = workerFactory.CreateWorker(workerType.Type, new ConcurrentQueue<string>(), cancellationTokenSource.Token);
-        //         Task.Run(() => worker.Start());
-        //     }
-        // }
-        // // Add messages to the queue
-        // // ...
-        // // Wait for the workers to finish processing messages
-        // cancellationTokenSource.Cancel();
-        // Console.ReadLine();
-    //}
-//}
