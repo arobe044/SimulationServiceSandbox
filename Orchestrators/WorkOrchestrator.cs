@@ -5,6 +5,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sandbox.Controllers;
 using Sandbox.Entities;
+using Sandbox.Models;
 
 namespace Sandbox.Orchestrators
 {
@@ -26,8 +27,17 @@ namespace Sandbox.Orchestrators
             try
             {
                 if (IsWorkAuthorized())
-                {
-                    CreateTaskList(request);
+                {   
+                    /////////////////
+                    ///TODO: either (ideally) would move these to inside emulator once Job/Task queue figured out 
+                    /// (currently scoped to task so repeat responses would occur)
+                    /// OR change CreateLocusTaskList to receive deserialized request (avoid deserializing twice)
+                    var requestObject = JsonConvert.DeserializeObject<OrderJobRequest>(request);
+                    CreateAcceptedResponse(requestObject);
+                    CreateToteInductResponse(requestObject); 
+                    /////////////////
+
+                    CreateLocusTaskList(request);
                 }
                 else
                 {
@@ -41,7 +51,7 @@ namespace Sandbox.Orchestrators
             }
         }
 
-        private void CreateTaskList(string request)
+        private void CreateLocusTaskList(string request)
         {
             var requestObject = JsonConvert.DeserializeObject<OrderJobRequest>(request);
 
@@ -71,6 +81,35 @@ namespace Sandbox.Orchestrators
             //  if jobId is in cache
             return true;
         }
+
+    ////////MAPPING
+    private static string CreateAcceptedResponse(OrderJobRequest request)
+    {
+        //var result = mapper.Map<OrderJobResult_Accept>(request);
+        var result = new OrderJobResult_Accept
+        {
+            EventType = "ACCEPT",
+            JobStatus = "COMPLETED",
+            JobDate = DateTime.UtcNow.ToString(),
+            RequestId = request.RequestId
+        };
+        return JsonConvert.SerializeObject(result);
+    }
+
+    private static string CreateToteInductResponse(OrderJobRequest request)
+    {
+        //var result = mapper.Map<OrderJobResult_ToteInduct>(request);
+        var result = new OrderJobResult_ToteInduct
+        {
+            EventType = "TOTEINDUCT",
+            JobStatus = "COMPLETED",
+            JobDate = DateTime.UtcNow.ToString(),
+            ToteId = "T12345", //coordinate with other responses in future
+            JobRobot = "P3-001", //coordinate with other responses in future
+            JobId = request.JobId
+        };
+        return JsonConvert.SerializeObject(result);
+    }
     }
 }
 
