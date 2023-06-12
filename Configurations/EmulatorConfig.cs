@@ -11,7 +11,7 @@ namespace Sandbox.Configurations;
         public string TaskExchangeName { get; set; } = "";
     }
 
-    public class WorkerConfig
+    public class EmulatorConfig
     {
         public int InstanceNum { get; set; }
 

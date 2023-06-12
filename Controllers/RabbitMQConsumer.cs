@@ -10,13 +10,13 @@ namespace Sandbox.Controllers;
 public class RabbitMQConsumer : IRabbitMQConsumer
 {
     private readonly RabbitMQConfig _rmqConfig;
-    private readonly IDictionary<string,WorkerConfig> _emConfigList;
+    private readonly IDictionary<string,EmulatorConfig> _emConfigList;
     private readonly ConnectionFactory _connectionFactory;
     private readonly IConnection _consumerConnection;
     private readonly IModel _requestConsumeChannel;
     private readonly IModel _taskConsumeChannel;
 
-    public RabbitMQConsumer(RabbitMQConfig rmqConfig, IDictionary<string,WorkerConfig> emConfigList)
+    public RabbitMQConsumer(RabbitMQConfig rmqConfig, IDictionary<string,EmulatorConfig> emConfigList)
     {      
         _rmqConfig = rmqConfig;
         _emConfigList = emConfigList;

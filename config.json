@@ -9,7 +9,7 @@
         "ResponseExchangeName":"sim_service_responses_demo_exchange",
         "TaskExchangeName":"sim_service_tasks_demo_exchange"
     },
-    "WorkerConfig": 
+    "EmulatorConfig": 
     {
         "LocusEmulator":
         {
@@ -21,7 +21,7 @@
             "TaskQueueName": "sim_service_tasks_demo_queue",
             "TaskRoutingKey": "demo_task_key"
         },
-        "WorkerA":
+        "EmulatorA":
         {
             "InstanceNum": 0,
             "RequestQueueName": "sim_service_requests_demo_queue",
@@ -31,7 +31,7 @@
             "TaskQueueName": "sim_service_tasks_demo_queue",
             "TaskRoutingKey": "demo_task_key"
         },
-        "WorkerB":
+        "EmulatorB":
         {
             "InstanceNum": 0,
             "RequestQueueName": "sim_service_requests_demo_queue",

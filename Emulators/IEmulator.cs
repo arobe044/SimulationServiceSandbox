@@ -1,6 +1,6 @@
-namespace Sandbox.Workers;
+namespace Sandbox.Emulators;
 
-public interface IWorker
+public interface IEmulator
 {
     Task StartAsync(CancellationToken stoppingToken, int instance);
 }

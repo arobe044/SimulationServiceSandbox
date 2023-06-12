@@ -10,14 +10,14 @@ namespace Sandbox.Controllers;
 public class RabbitMQProducer : IRabbitMQProducer
 {
     private readonly RabbitMQConfig _rmqConfig;
-    private readonly IDictionary<string,WorkerConfig> _emConfigList;
+    private readonly IDictionary<string,EmulatorConfig> _emConfigList;
     private readonly ConnectionFactory _connectionFactory;
     private readonly IConnection _publisherConnection;
     private readonly IModel _requestPublishChannel;
     private readonly IModel _responsePublishChannel;
     private readonly IModel _taskPublishChannel;
 
-    public RabbitMQProducer(RabbitMQConfig rmqConfig, IDictionary<string,WorkerConfig> emConfigList)
+    public RabbitMQProducer(RabbitMQConfig rmqConfig, IDictionary<string,EmulatorConfig> emConfigList)
     {      
         _rmqConfig = rmqConfig;
         _emConfigList = emConfigList;

@@ -6,17 +6,17 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Sandbox.Configurations;
 
-namespace Sandbox.Workers;
+namespace Sandbox.Emulators;
 
-public class WorkerA : IWorker
+public class EmulatorA : IEmulator
 {
     private readonly ConnectionFactory _connectionFactory;
     private readonly IConnection _connection;
     private readonly IModel _channel;
     private readonly RabbitMQConfig _rmqConfig;
-    private readonly ILogger<WorkerA> _logger;
+    private readonly ILogger<EmulatorA> _logger;
 
-    public WorkerA(ILogger<WorkerA> logger, RabbitMQConfig rmqConfig)
+    public EmulatorA(ILogger<EmulatorA> logger, RabbitMQConfig rmqConfig)
     {
         _rmqConfig = rmqConfig;
         _connectionFactory = new ConnectionFactory() { HostName = _rmqConfig.HostName, Port = _rmqConfig.Port, UserName = _rmqConfig.Username, Password = _rmqConfig.Password };
@@ -31,14 +31,14 @@ public class WorkerA : IWorker
         {
             try
             {
-                _logger.LogInformation($"WorkerA {instance} doing work");
+                _logger.LogInformation($"EmulatorA {instance} doing work");
             
                 var consumer = new EventingBasicConsumer(_channel);
                 consumer.Received += (model, ea) =>
                 {
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
-                    _logger.LogInformation($"WorkerA {instance} processing message");
+                    _logger.LogInformation($"EmulatorA {instance} processing message");
                                 
                     _channel.BasicAck(ea.DeliveryTag, multiple: false);
                 };
@@ -48,7 +48,7 @@ public class WorkerA : IWorker
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while processing messages in WorkerA.");
+                _logger.LogError(ex, "An error occurred while processing messages in EmulatorA.");
             }
         }, stoppingToken);
     }

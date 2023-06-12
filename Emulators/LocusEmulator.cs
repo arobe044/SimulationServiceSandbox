@@ -11,9 +11,9 @@ using Sandbox.Controllers;
 using Sandbox.Entities;
 using Sandbox.Models;
 
-namespace Sandbox.Workers;
+namespace Sandbox.Emulators;
 
-public class LocusEmulator : IWorker
+public class LocusEmulator : IEmulator
 {
     private string _jobIdInProcess = "";
     private readonly IRabbitMQProducer _rmqProducer;
@@ -38,7 +38,7 @@ public class LocusEmulator : IWorker
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while processing messages in WorkerA.");
+                _logger.LogError(ex, "An error occurred while processing messages in EmulatorA.");
             }
         }, stoppingToken);
     }
