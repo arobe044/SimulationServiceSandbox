@@ -28,15 +28,6 @@ namespace Sandbox.Orchestrators
             {
                 if (IsWorkAuthorized())
                 {   
-                    /////////////////
-                    ///TODO: either (ideally) would move these to inside emulator once Job/Task queue figured out 
-                    /// (currently scoped to task so repeat responses would occur)
-                    /// OR change CreateLocusTaskList to receive deserialized request (avoid deserializing twice)
-                    var requestObject = JsonConvert.DeserializeObject<OrderJobRequest>(request);
-                    CreateAcceptedResponse(requestObject);
-                    CreateToteInductResponse(requestObject); 
-                    /////////////////
-
                     CreateLocusTaskList(request);
                 }
                 else
@@ -55,10 +46,25 @@ namespace Sandbox.Orchestrators
         {
             var requestObject = JsonConvert.DeserializeObject<OrderJobRequest>(request);
 
+            ///TODO: (ideally) would move these to inside emulator, but emulator is triggered by tasks,
+            ///  so currrent architecture would cause duplicate accepted and toteinduct responses
+            var acceptedResponse = CreateAcceptedResponse(requestObject);
+            _rmqProducer.PublishResponse(acceptedResponse);
+
+            var inductedResponse = CreateToteInductResponse(requestObject);
+            _rmqProducer.PublishResponse(inductedResponse);
+
             List<OrderJobTask> OrderJobTasks = requestObject.JobTasks.OrderJobTask;
             foreach (var task in OrderJobTasks)
             {
-                var serializedTask = JsonConvert.SerializeObject(task);
+                var taskData = new TaskData
+                {
+                    Task = task,
+                    RequestData = request
+                };
+
+                var serializedTask = JsonConvert.SerializeObject(taskData);
+                
                 _rmqProducer.PublishTask(serializedTask);
                 
                 Console.WriteLine($"Published Task {task.TaskType} to TaskList for Locus Emulator");
@@ -82,34 +88,34 @@ namespace Sandbox.Orchestrators
             return true;
         }
 
-    ////////MAPPING
-    private static string CreateAcceptedResponse(OrderJobRequest request)
-    {
-        //var result = mapper.Map<OrderJobResult_Accept>(request);
-        var result = new OrderJobResult_Accept
+        ////////MAPPING
+        private static string CreateAcceptedResponse(OrderJobRequest request)
         {
-            EventType = "ACCEPT",
-            JobStatus = "COMPLETED",
-            JobDate = DateTime.UtcNow.ToString(),
-            RequestId = request.RequestId
-        };
-        return JsonConvert.SerializeObject(result);
-    }
+            //var result = mapper.Map<OrderJobResult_Accept>(request);
+            var result = new OrderJobResult_Accept
+            {
+                EventType = "ACCEPT",
+                JobStatus = "COMPLETED",
+                JobDate = DateTime.UtcNow.ToString(),
+                RequestId = request.RequestId
+            };
+            return JsonConvert.SerializeObject(result);
+        }
 
-    private static string CreateToteInductResponse(OrderJobRequest request)
-    {
-        //var result = mapper.Map<OrderJobResult_ToteInduct>(request);
-        var result = new OrderJobResult_ToteInduct
+        private static string CreateToteInductResponse(OrderJobRequest request)
         {
-            EventType = "TOTEINDUCT",
-            JobStatus = "COMPLETED",
-            JobDate = DateTime.UtcNow.ToString(),
-            ToteId = "T12345", //coordinate with other responses in future
-            JobRobot = "P3-001", //coordinate with other responses in future
-            JobId = request.JobId
-        };
-        return JsonConvert.SerializeObject(result);
-    }
+            //var result = mapper.Map<OrderJobResult_ToteInduct>(request);
+            var result = new OrderJobResult_ToteInduct
+            {
+                EventType = "TOTEINDUCT",
+                JobStatus = "COMPLETED",
+                JobDate = DateTime.UtcNow.ToString(),
+                ToteId = "T12345", //coordinate with other responses in future
+                JobRobot = "P3-001", //coordinate with other responses in future
+                JobId = request.JobId
+            };
+            return JsonConvert.SerializeObject(result);
+        }
     }
 }
 

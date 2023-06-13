@@ -33,12 +33,8 @@ public class LocusEmulator : IEmulator
         {
             try
             {
-                //TODO: DELETE - FOR TESTING
-                HandleTasks("");
-                ///
                 _logger.LogInformation($"LocusEmulator {instance} doing work");
-                //_rmqConsumer.ConsumeTask((task) => HandleTasks(task));
-                //pick complete
+                _rmqConsumer.ConsumeTask((task) => HandleTasks(task));
             }
             catch (Exception ex)
             {
@@ -47,30 +43,24 @@ public class LocusEmulator : IEmulator
         }, stoppingToken);
     }
 
-    public void HandleTasks(string task) //TODO: needs to receive jobId, requestId (and possibly other job data)
+    public void HandleTasks(string taskData) //TODO: needs to receive jobId, requestId (and possibly other job data)
     {
-        //var currentTask = JsonConvert.DeserializeObject<OrderJobTask>(task);
+        var taskDataObj = JsonConvert.DeserializeObject<TaskData>(taskData);
+        var currentTask = taskDataObj.Task;
+        var request = JsonConvert.DeserializeObject<OrderJobRequest>(taskDataObj.RequestData);
 
         //var config = new MapperConfiguration(cfg => { cfg.AddProfile<OrderJobMappingProfile>();});
         //var mapper = config.CreateMapper();
-
-        //////////
-        //TODO: replace with real request or request data - mocking for testing
-        var request = MockRequest();
-        var currentTask = request.JobTasks.OrderJobTask.First();
-        ///////////
         
         if (currentTask?.TaskType == "PICK") //TODO: maybe make this a switch
         {
             var pickResponse = CreatePickResponse(request, currentTask);
-            //var pickResponse = CreatePickResponse(request, currentTask);
             _rmqProducer.PublishResponse(pickResponse);
             Console.WriteLine("Published Pick Response");
         }
         else if (currentTask?.TaskType == "PACK")
         {
             var pickCompleteResponse = CreatePickCompleteResponse(request);
-            //var pickCompleteResponse = CreatePickCompleteResponse(request);
             _rmqProducer.PublishResponse(pickCompleteResponse);
             Console.WriteLine("Published PickComplete Response");
         }
@@ -156,46 +146,5 @@ public class LocusEmulator : IEmulator
             JobTasks = CreateCompleteResponseJobTasks(request)
         };
         return JsonConvert.SerializeObject(result);
-    }
-
-//////////////TODO: DELETE - MOCKING REQUEST UNTIL JOB/TASK QUEUE FIGURED OUT
-    private OrderJobRequest MockRequest()
-    {
-        var picktask1 = new OrderJobTask 
-        {
-            JobTaskId = "902123101",
-            TaskType = "PICK"
-        };
-        var picktask2 = new OrderJobTask 
-        {
-            JobTaskId = "902123102",
-            TaskType = "PICK"
-        };
-        var packtask = new OrderJobTask 
-        {
-            JobTaskId = "902123103",
-            TaskType = "PACK"
-        };
-
-        var tasklist = new List<OrderJobTask>
-        {
-            picktask1,
-            picktask2,
-            packtask
-        };
-
-        var jobTasks = new Entities.JobTasks 
-        {
-            OrderJobTask = tasklist
-        };
-
-        var request = new OrderJobRequest
-        {
-            JobId = "090000043119715",
-            RequestId = "641217727D75257AE053419CD40A1C2C",
-            JobTasks = jobTasks
-        };
-
-        return request;
     }
 }
