@@ -3,17 +3,20 @@ using Sandbox.Configurations;
 using Sandbox.Factories;
 using Microsoft.Extensions.Logging;
 using Sandbox.Emulators;
+using Sandbox.Controllers;
 
-namespace Sandbox;
+namespace Sandbox.Services;
 
 public class EmulatorService : BackgroundService
 {
     private readonly IEmulatorFactory _emulatorFactory;
+    private readonly IRabbitMQPublisher _rmqPublisher;
     private readonly ILogger<EmulatorService> _logger;
     private readonly IDictionary<string, EmulatorConfig> _emulatorDictionary;
-    public EmulatorService(IEmulatorFactory emulatorFactory, ILogger<EmulatorService> logger, IDictionary<string, EmulatorConfig> emulatorDictionary)
+    public EmulatorService(IEmulatorFactory emulatorFactory, IRabbitMQPublisher rmqPublisher, ILogger<EmulatorService> logger, IDictionary<string, EmulatorConfig> emulatorDictionary)
     {
         _emulatorFactory = emulatorFactory;
+        _rmqPublisher = rmqPublisher;
         _logger = logger;
         _emulatorDictionary = emulatorDictionary;
     }
@@ -31,6 +34,7 @@ public class EmulatorService : BackgroundService
                 {
                     var emulator = await _emulatorFactory.CreateEmulatorAsync(emulatorType.Key);
                     emulators.Add(emulator);
+                    _rmqPublisher.BuildTaskQueue(emulatorType.Key);
                     _logger.LogInformation($"Starting emulator '{emulatorType.Key}' number {i+1}.");
                     await emulator.StartAsync(stoppingToken, i+1);
                 }

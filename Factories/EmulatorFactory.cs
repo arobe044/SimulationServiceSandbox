@@ -11,14 +11,14 @@ public class EmulatorFactory : IEmulatorFactory
     private readonly IServiceProvider _serviceProvider;
     private readonly RabbitMQConfig _rmqConfig;
     private readonly IRabbitMQConsumer _rmqConsumer;
-    private readonly IRabbitMQProducer _rmqProducer;
+    private readonly IRabbitMQPublisher _rmqPublisher;
 
-    public EmulatorFactory(IServiceProvider serviceProvider, RabbitMQConfig rmqConfig, IRabbitMQConsumer rmqConsumer, IRabbitMQProducer rmqProducer)
+    public EmulatorFactory(IServiceProvider serviceProvider, RabbitMQConfig rmqConfig, IRabbitMQConsumer rmqConsumer, IRabbitMQPublisher rmqPublisher)
     {
         _serviceProvider = serviceProvider;
         _rmqConfig = rmqConfig;
         _rmqConsumer = rmqConsumer;
-        _rmqProducer = rmqProducer;
+        _rmqPublisher = rmqPublisher;
     }
     public async Task<IEmulator> CreateEmulatorAsync(string emulatorType)
     {
@@ -38,7 +38,7 @@ public class EmulatorFactory : IEmulatorFactory
     {
         //var messageSender = _serviceProvider.GetRequiredService<IMessageSender>();
         var logger = _serviceProvider.GetRequiredService<ILogger<LocusEmulator>>();
-        return new LocusEmulator(logger, _rmqProducer, _rmqConsumer);
+        return new LocusEmulator(logger, _rmqPublisher, _rmqConsumer);
     }
     
     private async Task<IEmulator> CreateEmulatorAAsync()

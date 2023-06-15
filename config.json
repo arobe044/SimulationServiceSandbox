@@ -5,41 +5,41 @@
         "Port": "5672",
         "Username": "guest",
         "Password": "guest",
-        "RequestExchangeName":"sim_service_requests_demo_exchange",
-        "ResponseExchangeName":"sim_service_responses_demo_exchange",
-        "TaskExchangeName":"sim_service_tasks_demo_exchange"
+        "RequestExchange":"sim_service_requests_exchange",
+        "ResponseExchange":"sim_service_responses_exchange",
+        "TaskExchange":"sim_service_tasks_exchange"
     },
     "EmulatorConfig": 
     {
         "LocusEmulator":
         {
             "InstanceNum": 1,
-            "RequestQueueName": "sim_service_requests_demo_queue",
-            "RequestRoutingKey": "demo_request_key",
-            "ResponseQueueName": "sim_service_responses_demo_queue",
-            "ResponseRoutingKey": "demo_response_key",
-            "TaskQueueName": "sim_service_tasks_demo_queue",
-            "TaskRoutingKey": "demo_task_key"
+            "RequestQueue": "locus_requests_queue",
+            "RequestRoutingKey": "locus_request_key",
+            "ResponseQueue": "locus_responses_queue",
+            "ResponseRoutingKey": "locus_response_key",
+            "TaskQueue": "locus_tasks_queue",
+            "TaskRoutingKey": "locus_task_key"
         },
         "EmulatorA":
         {
             "InstanceNum": 0,
-            "RequestQueueName": "sim_service_requests_demo_queue",
-            "RequestRoutingKey": "demo_request_key",
-            "ResponseQueueName": "sim_service_responses_demo_queue",
-            "ResponseRoutingKey": "demo_response_key",
-            "TaskQueueName": "sim_service_tasks_demo_queue",
-            "TaskRoutingKey": "demo_task_key"
+            "RequestQueue": "demo_A_requests_queue",
+            "RequestRoutingKey": "demo_A_request_key",
+            "ResponseQueue": "demo_A_responses_queue",
+            "ResponseRoutingKey": "demo_A_response_key",
+            "TaskQueue": "demo_A_tasks_queue",
+            "TaskRoutingKey": "demo_A_task_key"
         },
         "EmulatorB":
         {
             "InstanceNum": 0,
-            "RequestQueueName": "sim_service_requests_demo_queue",
-            "RequestRoutingKey": "demo_request_key",
-            "ResponseQueueName": "sim_service_responses_demo_queue",
-            "ResponseRoutingKey": "demo_response_key",                
-            "TaskQueueName": "sim_service_tasks_demo_queue",
-            "TaskRoutingKey": "demo_task_key"
+            "RequestQueue": "demo_B_requests_queue",
+            "RequestRoutingKey": "demo_B_request_key",
+            "ResponseQueue": "demo_B_responses_queue",
+            "ResponseRoutingKey": "demo_B_response_key",                
+            "TaskQueue": "demo_B_tasks_queue",
+            "TaskRoutingKey": "demo_B_task_key"
         }
     }
 }

@@ -26,10 +26,15 @@ public class RabbitMQConsumer : IRabbitMQConsumer
         _taskConsumeChannel = _consumerConnection.CreateModel();
     }
 
-    public void ConsumeRequest(Action<string> messageHandler)
+    public void ConsumeRequest(string emulatorType, Action<string> messageHandler)
     {
         try
         {
+            //TODO: Openapi for this and queues?
+            _requestConsumeChannel.ExchangeDeclare(exchange:_rmqConfig.RequestExchange, type: ExchangeType.Topic, durable:true);
+            _requestConsumeChannel.QueueDeclare(_emConfigList[emulatorType].RequestQueue, true, false, false, null);
+            _requestConsumeChannel.QueueBind(queue:_emConfigList[emulatorType].RequestQueue, exchange: _rmqConfig.RequestExchange, routingKey: _emConfigList[emulatorType].RequestRoutingKey);
+
             var consumer = new EventingBasicConsumer(_requestConsumeChannel);
             consumer.Received += (channel, ea) =>
             {
@@ -38,8 +43,8 @@ public class RabbitMQConsumer : IRabbitMQConsumer
                 messageHandler(message);
                 _requestConsumeChannel.BasicAck(ea.DeliveryTag, false);
             };
-            string consumerTag = _requestConsumeChannel.BasicConsume(_emConfigList["LocusEmulator"].RequestQueueName, false, consumer);
-            Console.WriteLine($"Listening for messages on queue...");
+            string consumerTag = _requestConsumeChannel.BasicConsume(_emConfigList[emulatorType].RequestQueue, false, consumer);
+            Console.WriteLine($"Listening for messages on {emulatorType} request queue...");
             Console.ReadLine();
         }
         catch (Exception ex)
@@ -61,7 +66,7 @@ public class RabbitMQConsumer : IRabbitMQConsumer
                 messageHandler(message);
                 _taskConsumeChannel.BasicAck(ea.DeliveryTag, false);
             };
-            _taskConsumeChannel.BasicConsume(_emConfigList["LocusEmulator"].TaskQueueName, false, consumer);
+            _taskConsumeChannel.BasicConsume(_emConfigList["LocusEmulator"].TaskQueue, false, consumer);
             Console.WriteLine($"Listening for messages on task queue...");
             Console.ReadLine();
         }

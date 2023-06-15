@@ -16,13 +16,13 @@ namespace Sandbox.Emulators;
 public class LocusEmulator : IEmulator
 {
     private string _jobIdInProcess = "";
-    private readonly IRabbitMQProducer _rmqProducer;
+    private readonly IRabbitMQPublisher _rmqPublisher;
     private readonly IRabbitMQConsumer _rmqConsumer;
     private readonly ILogger<LocusEmulator> _logger;
 
-    public LocusEmulator(ILogger<LocusEmulator> logger, IRabbitMQProducer rmqProducer, IRabbitMQConsumer rmqConsumer)
+    public LocusEmulator(ILogger<LocusEmulator> logger, IRabbitMQPublisher rmqPublisher, IRabbitMQConsumer rmqConsumer)
     {
-        _rmqProducer = rmqProducer;
+        _rmqPublisher = rmqPublisher;
         _rmqConsumer = rmqConsumer;
         _logger = logger;
     }
@@ -43,8 +43,9 @@ public class LocusEmulator : IEmulator
         }, stoppingToken);
     }
 
-    public void HandleTasks(string taskData) //TODO: needs to receive jobId, requestId (and possibly other job data)
+    public void HandleTasks(string taskData)
     {
+        var emulatorType = "LocusEmulator";
         var taskDataObj = JsonConvert.DeserializeObject<TaskData>(taskData);
         var currentTask = taskDataObj.Task;
         var request = JsonConvert.DeserializeObject<OrderJobRequest>(taskDataObj.RequestData);
@@ -55,14 +56,14 @@ public class LocusEmulator : IEmulator
         if (currentTask?.TaskType == "PICK") //TODO: maybe make this a switch
         {
             var pickResponse = CreatePickResponse(request, currentTask);
-            _rmqProducer.PublishResponse(pickResponse);
-            Console.WriteLine("Published Pick Response");
+            _rmqPublisher.PublishResponse(emulatorType, pickResponse);
+            Console.WriteLine("Published RESPONSE: OrderJob Pick Result");
         }
         else if (currentTask?.TaskType == "PACK")
         {
             var pickCompleteResponse = CreatePickCompleteResponse(request);
-            _rmqProducer.PublishResponse(pickCompleteResponse);
-            Console.WriteLine("Published PickComplete Response");
+            _rmqPublisher.PublishResponse(emulatorType, pickCompleteResponse);
+            Console.WriteLine("Published RESPONSE: OrderJob PickComplete Result");
         }
     }
 

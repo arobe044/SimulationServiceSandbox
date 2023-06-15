@@ -6,9 +6,9 @@ namespace Sandbox.Configurations;
         public int Port { get; set; }
         public string Username { get; set; } = "";
         public string Password { get; set; } = "";
-        public string RequestExchangeName { get; set; } = "";
-        public string ResponseExchangeName { get; set; } = "";
-        public string TaskExchangeName { get; set; } = "";
+        public string RequestExchange { get; set; } = "";
+        public string ResponseExchange { get; set; } = "";
+        public string TaskExchange { get; set; } = "";
     }
 
     public class EmulatorConfig
@@ -16,14 +16,14 @@ namespace Sandbox.Configurations;
         public int InstanceNum { get; set; }
 
         ///REQUEST QUEUE
-        public string RequestQueueName { get; set; } = "";
+        public string RequestQueue { get; set; } = "";
         public string RequestRoutingKey { get; set; } = "";
 
         ///RESPONSE QUEUE
-        public string ResponseQueueName { get; set; } = "";
+        public string ResponseQueue { get; set; } = "";
         public string ResponseRoutingKey { get; set; } = "";
 
         //TASK QUEUE
-        public string TaskQueueName { get; set; } = "";
+        public string TaskQueue { get; set; } = "";
         public string TaskRoutingKey { get; set; } = "";
     }

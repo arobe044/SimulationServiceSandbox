@@ -1,13 +1,10 @@
-using System.Security.AccessControl;
 using System.Text;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 using Sandbox.Configurations;
 
 namespace Sandbox.Controllers;
 
-public class RabbitMQProducer : IRabbitMQProducer
+public class RabbitMQPublisher : IRabbitMQPublisher
 {
     private readonly RabbitMQConfig _rmqConfig;
     private readonly IDictionary<string,EmulatorConfig> _emConfigList;
@@ -17,7 +14,7 @@ public class RabbitMQProducer : IRabbitMQProducer
     private readonly IModel _responsePublishChannel;
     private readonly IModel _taskPublishChannel;
 
-    public RabbitMQProducer(RabbitMQConfig rmqConfig, IDictionary<string,EmulatorConfig> emConfigList)
+    public RabbitMQPublisher(RabbitMQConfig rmqConfig, IDictionary<string,EmulatorConfig> emConfigList)
     {      
         _rmqConfig = rmqConfig;
         _emConfigList = emConfigList;
@@ -28,15 +25,24 @@ public class RabbitMQProducer : IRabbitMQProducer
         _taskPublishChannel = _publisherConnection.CreateModel();
     }
     
-    public void PublishTask(string serializedTask)
+    public void BuildTaskQueue(string emulatorType)
+    {
+        _taskPublishChannel.ExchangeDeclare(exchange:_rmqConfig.TaskExchange, type: ExchangeType.Topic, durable:true);
+        _taskPublishChannel.QueueDeclare(_emConfigList[emulatorType].TaskQueue, true, false, false, null);
+        _taskPublishChannel.QueueBind(queue:_emConfigList[emulatorType].TaskQueue, exchange: _rmqConfig.TaskExchange, routingKey: _emConfigList[emulatorType].TaskRoutingKey);
+    }
+
+    public void PublishTask(string emulatorType, string serializedTask)
     {
         try
         {
+            //declare exchange and bind queue
+
             if (serializedTask is not null) 
             {
                 var task = Encoding.UTF8.GetBytes(serializedTask);
-                _taskPublishChannel.BasicPublish(   _rmqConfig.TaskExchangeName, 
-                                                    _emConfigList["LocusEmulator"].TaskRoutingKey, 
+                _taskPublishChannel.BasicPublish(   _rmqConfig.TaskExchange, 
+                                                    _emConfigList[emulatorType].TaskRoutingKey, 
                                                     null, task  );
             };
         }
@@ -46,25 +52,27 @@ public class RabbitMQProducer : IRabbitMQProducer
         }
     }
 
-    public void PublishResponse(string serializedResponse)
+    public void PublishResponse(string emulatorType, string serializedResponse)
     {
         try
         {
+            //declare exchange and bind queue
+
             if (serializedResponse is not null) 
             {
                 var response = Encoding.UTF8.GetBytes(serializedResponse);
-                _responsePublishChannel.BasicPublish(   _rmqConfig.ResponseExchangeName, 
-                                                        _emConfigList["LocusEmulator"].ResponseRoutingKey, 
+                _responsePublishChannel.BasicPublish(   _rmqConfig.ResponseExchange, 
+                                                        _emConfigList[emulatorType].ResponseRoutingKey, 
                                                         null, response  );
             };
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error publishing response: ", ex);
+            Console.WriteLine($"Error publishing {emulatorType} response: ", ex);
         }
     }
 
-    public void PublishRequest(string serializedRequest)
+    public void PublishRequest(string emulatorType, string serializedRequest)
     {
         //In the case that the emulator is adding a job to another emulator's request queue
         try
@@ -72,14 +80,14 @@ public class RabbitMQProducer : IRabbitMQProducer
             if (serializedRequest is not null) 
             {
                 var request = Encoding.UTF8.GetBytes(serializedRequest);
-                _requestPublishChannel.BasicPublish(    _rmqConfig.RequestExchangeName, 
-                                                        _emConfigList["LocusEmulator"].RequestRoutingKey, 
+                _requestPublishChannel.BasicPublish(    _rmqConfig.RequestExchange,
+                                                        _emConfigList[emulatorType].RequestRoutingKey, 
                                                         null, request   );
             };
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error publishing new request: ", ex);
+            Console.WriteLine("Error publishing new request: ", ex.Message);
         }
     }
 
